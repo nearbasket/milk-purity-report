@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>NearBasket - Fresh Milk Quality Report</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e9edf2 100%);
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Main Report Card */
+        .report-card {
+            max-width: 550px;
+            width: 100%;
+            margin: 20px auto;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1), 0 4px 12px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            transition: transform 0.2s ease;
+        }
+
+        .report-card:hover {
+            transform: translateY(-4px);
+        }
+
+        /* Header Section with Logo */
+        .header {
+            background: linear-gradient(135deg, #1a5f2a 0%, #0d3b1a 100%);
+            padding: 20px 24px;
+            text-align: center;
+            color: white;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .logo-img {
+            width: 48px;
+            height: 48px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        /* Agar aapke paas real logo image hai to ye use karein */
+        .logo-img img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+
+        .brand-name {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .tagline {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-top: 4px;
+            font-weight: 500;
+        }
+
+        .report-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-top: 12px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+            display: inline-block;
+        }
+
+        /* Content Area */
+        .content {
+            padding: 24px;
+        }
+
+        /* Tested By Section with Banner */
+        .tested-by-banner {
+            position: relative;
+            margin-bottom: 24px;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .banner-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 0;
+        }
+
+        .tested-by {
+            position: relative;
+            z-index: 1;
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(2px);
+            padding: 20px 16px;
+            text-align: center;
+            border-radius: 20px;
+        }
+
+        .tested-by .label {
+            font-size: 13px;
+            color: #a5d6a7;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .tested-by .team {
+            font-size: 22px;
+            font-weight: 800;
+            color: white;
+            margin-top: 6px;
+        }
+
+        .tested-by .note {
+            font-size: 12px;
+            color: #c8e6c9;
+            margin-top: 6px;
+        }
+
+        /* No Banner image - Fallback */
+        .tested-by-banner.no-banner .tested-by {
+            background: linear-gradient(135deg, #1b5e20, #2e7d32);
+        }
+
+        /* Date Badge */
+        .date-badge {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .date-badge .date {
+            background: #e8eaf6;
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a237e;
+        }
+
+        /* Milk Quality Section */
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-left: 4px solid #2e7d32;
+            padding-left: 12px;
+        }
+
+        .quality-grid {
+            background: #fafafa;
+            border-radius: 20px;
+            padding: 16px;
+            margin-bottom: 24px;
+        }
+
+        .quality-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #e5e7eb;
+            flex-wrap: wrap;
+        }
+
+        .quality-item:last-child {
+            border-bottom: none;
+        }
+
+        .quality-name {
+            font-weight: 600;
+            color: #374151;
+            font-size: 16px;
+        }
+
+        .quality-value {
+            font-size: 20px;
+            font-weight: 800;
+            color: #1f2937;
+        }
+
+        .quality-status {
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 4px 10px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        /* Progress Bar - FIXED SCALE for Cow Milk */
+        .progress-bar-container {
+            width: 100%;
+            margin-top: 4px;
+            margin-bottom: 8px;
+            background: #e5e7eb;
+            border-radius: 10px;
+            height: 8px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            background: linear-gradient(90deg, #2e7d32, #66bb6a);
+            height: 100%;
+            border-radius: 10px;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .range-hint {
+            font-size: 10px;
+            color: #9ca3af;
+            text-align: right;
+            margin-top: 2px;
+        }
+
+        /* Test Photo Section */
+        .photo-section {
+            margin-bottom: 24px;
+        }
+
+        .photo-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #4b5563;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .test-photo {
+            width: 100%;
+            border-radius: 20px;
+            background: #f3f4f6;
+            min-height: 180px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #e5e7eb;
+            overflow: hidden;
+        }
+
+        .test-photo img {
+            width: 100%;
+            height: auto;
+            display: block;
+            object-fit: cover;
+        }
+
+        .test-photo .placeholder {
+            color: #9ca3af;
+            text-align: center;
+            padding: 40px;
+            font-size: 14px;
+        }
+
+        /* Adulteration Tests */
+        .test-list {
+            background: #fafafa;
+            border-radius: 20px;
+            padding: 16px;
+            margin-bottom: 24px;
+        }
+
+        .test-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .test-item:last-child {
+            border-bottom: none;
+        }
+
+        .test-name {
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .test-result {
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 13px;
+        }
+
+        .test-result.pass {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .test-result.fail {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        /* Footer */
+        .footer {
+            background: #f8fafc;
+            padding: 20px 24px;
+            text-align: center;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .trust-message {
+            font-size: 14px;
+            color: #1e293b;
+            font-weight: 500;
+            margin-bottom: 12px;
+        }
+
+        .disclaimer {
+            font-size: 11px;
+            color: #94a3b8;
+        }
+
+        /* Loading State */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6b7280;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            body {
+                padding: 12px;
+            }
+            .content {
+                padding: 18px;
+            }
+            .quality-value {
+                font-size: 16px;
+            }
+            .brand-name {
+                font-size: 22px;
+            }
+            .logo-img {
+                width: 40px;
+                height: 40px;
+                font-size: 24px;
+            }
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .report-card {
+                box-shadow: none;
+                margin: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="report-card" id="reportCard">
+    <div class="header">
+        <div class="logo-container">
+            <div class="logo-img" id="logoContainer">
+                <!-- Default emoji logo, aap image se replace kar sakte ho -->
+                <span>🥛</span>
+            </div>
+            <div class="brand-name">NEARBASKET</div>
+        </div>
+        <div class="tagline">Fresh Milk Delivered Daily</div>
+        <div class="report-title">FRESH MILK QUALITY REPORT</div>
+    </div>
+
+    <div class="content" id="reportContent">
+        <div class="loading">Loading report...</div>
+    </div>
+
+    <div class="footer" id="reportFooter" style="display: none;">
+        <div class="trust-message">
+            💚 We don't hide behind lab reports. We test it ourselves. Every day. Every batch.
+        </div>
+        <div class="disclaimer">
+            This is an internal quality report from NearBasket. Tested fresh daily for your trust.
+        </div>
+    </div>
+</div>
+
+<script>
+    // ==================== FIXED SCALE FOR COW MILK ====================
+    // Cow Milk Standards:
+    // Fat: 3.0% to 6.0% (Rich milk ~4.5%)
+    // SNF: 8.0% to 10.0%
+    // Extra Added Water: 0% to 20% (0% is best)
+    
+    function calculateFatPercentage(fatValue) {
+        // Fat range: 3.0% to 6.0%
+        // 3.0% = 0%, 6.0% = 100%, 4.5% = 50%
+        let min = 3.0;
+        let max = 6.0;
+        let percentage = ((fatValue - min) / (max - min)) * 100;
+        return Math.min(100, Math.max(0, percentage));
+    }
+    
+    function calculateSNFPercentage(snfValue) {
+        // SNF range: 8.0% to 10.0%
+        // 8.0% = 0%, 10.0% = 100%, 8.7% = 35%
+        let min = 8.0;
+        let max = 10.0;
+        let percentage = ((snfValue - min) / (max - min)) * 100;
+        return Math.min(100, Math.max(0, percentage));
+    }
+    
+    function calculateWaterPercentage(waterValue) {
+        // Extra Added Water: 0% to 20% (0% is best)
+        // 0% = 100% (good), 20% = 0% (bad)
+        let maxWater = 20.0;
+        let percentage = ((maxWater - waterValue) / maxWater) * 100;
+        return Math.min(100, Math.max(0, percentage));
+    }
+
+    // Default data
+    const defaultData = {
+        date: "2026-01-19",
+        fat: 4.5,
+        snf: 8.7,
+        extra_added_water: 0,  // Changed from "water" to "extra_added_water"
+        banner_image: null,     // Banner image path (optional)
+        logo_image: null,       // Logo image path (optional)
+        fat_photo: null,
+        adulteration_photo: null,
+        tests: {
+            added_water: "PASS",
+            starch: "PASS",
+            urea: "PASS",
+            detergent: "PASS"
+        }
+    };
+
+    // Function to update logo if image provided
+    function updateLogo(logoPath) {
+        const logoContainer = document.getElementById('logoContainer');
+        if (logoPath && logoPath !== '') {
+            logoContainer.innerHTML = `<img src="${logoPath}" alt="NearBasket Logo" onerror="this.parentElement.innerHTML='<span>🥛</span>'">`;
+        }
+    }
+
+    // Function to render the report
+    function renderReport(data) {
+        const contentDiv = document.getElementById('reportContent');
+        const footerDiv = document.getElementById('reportFooter');
+        
+        // Calculate percentages with correct scale
+        const fatPercent = calculateFatPercentage(data.fat);
+        const snfPercent = calculateSNFPercentage(data.snf);
+        const waterPercent = calculateWaterPercentage(data.extra_added_water || 0);
+        
+        // Get range hints
+        const fatHint = data.fat >= 4.2 ? "⭐ Rich Quality" : (data.fat >= 3.5 ? "✓ Standard" : "⚠️ Low");
+        const snfHint = data.snf >= 8.5 ? "⭐ Good" : (data.snf >= 8.0 ? "✓ Standard" : "⚠️ Low");
+        const waterHint = (data.extra_added_water || 0) === 0 ? "✅ No added water" : `⚠️ ${data.extra_added_water}% detected`;
+        
+        // Banner HTML
+        const bannerHtml = data.banner_image && data.banner_image !== '' 
+            ? `<img class="banner-bg" src="${data.banner_image}" alt="Trust Banner" onerror="this.style.display='none';this.parentElement.classList.add('no-banner')">`
+            : '';
+        
+        const testedByHtml = `
+            <div class="tested-by-banner ${!data.banner_image ? 'no-banner' : ''}">
+                ${bannerHtml}
+                <div class="tested-by">
+                    <div class="label">🔬 TESTED BY</div>
+                    <div class="team">NEARBASKET QUALITY TEAM</div>
+                    <div class="note">(In-House Testing - Every Batch)</div>
+                </div>
+            </div>
+        `;
+        
+        const html = `
+            ${testedByHtml}
+
+            <!-- Date -->
+            <div class="date-badge">
+                <div class="date">📅 ${data.date} | Tested Fresh at 5:30 AM</div>
+            </div>
+
+            <!-- Milk Quality Section -->
+            <div class="section-title">
+                <span>📊</span> TODAY'S RESULTS
+            </div>
+
+            <div class="quality-grid">
+                <div class="quality-item">
+                    <div>
+                        <span class="quality-name">🥛 Fat</span>
+                        <span class="quality-status">${fatHint}</span>
+                    </div>
+                    <div class="quality-value">${data.fat}%</div>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" style="width: ${fatPercent}%"></div>
+                </div>
+                <div class="range-hint">Cow Milk Range: 3.0% - 6.0%</div>
+
+                <div class="quality-item">
+                    <div>
+                        <span class="quality-name">⚪ SNF (Solid Non Fat)</span>
+                        <span class="quality-status">${snfHint}</span>
+                    </div>
+                    <div class="quality-value">${data.snf}%</div>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" style="width: ${snfPercent}%"></div>
+                </div>
+                <div class="range-hint">Cow Milk Range: 8.0% - 10.0%</div>
+
+                <div class="quality-item">
+                    <div>
+                        <span class="quality-name">💧 Extra Added Water</span>
+                        <span class="quality-status">${waterHint}</span>
+                    </div>
+                    <div class="quality-value">${data.extra_added_water || 0}%</div>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" style="width: ${waterPercent}%"></div>
+                </div>
+                <div class="range-hint">0% = No Adulteration | Lower is Better</div>
+            </div>
+
+            <!-- Fat/SNF Test Photo -->
+            <div class="photo-section">
+                <div class="photo-label">
+                    <span>📸</span> FAT & SNF TEST PHOTO
+                </div>
+                <div class="test-photo" id="fatPhotoContainer">
+                    ${data.fat_photo ? 
+                        `<img src="${data.fat_photo}" alt="Fat and SNF Test" onerror="this.parentElement.innerHTML='<div class=\'placeholder\'>⚠️ Photo not found. Please add test photo.</div>'">` : 
+                        `<div class="placeholder">📷 Add test photo in "photos/fat-test.jpg"</div>`
+                    }
+                </div>
+            </div>
+
+            <!-- Adulteration Tests -->
+            <div class="section-title">
+                <span>🧪</span> ADULTERATION TESTS
+            </div>
+
+            <div class="test-list">
+                <div class="test-item">
+                    <span class="test-name">💧 No Added Water</span>
+                    <span class="test-result ${data.tests.added_water === 'PASS' ? 'pass' : 'fail'}">✓ ${data.tests.added_water}</span>
+                </div>
+                <div class="test-item">
+                    <span class="test-name">🌾 No Starch</span>
+                    <span class="test-result ${data.tests.starch === 'PASS' ? 'pass' : 'fail'}">✓ ${data.tests.starch}</span>
+                </div>
+                <div class="test-item">
+                    <span class="test-name">🧪 No Urea</span>
+                    <span class="test-result ${data.tests.urea === 'PASS' ? 'pass' : 'fail'}">✓ ${data.tests.urea}</span>
+                </div>
+                <div class="test-item">
+                    <span class="test-name">🧼 No Detergent</span>
+                    <span class="test-result ${data.tests.detergent === 'PASS' ? 'pass' : 'fail'}">✓ ${data.tests.detergent}</span>
+                </div>
+            </div>
+
+            <!-- Adulteration Test Photo -->
+            <div class="photo-section">
+                <div class="photo-label">
+                    <span>📸</span> ADULTERATION TEST PHOTO
+                </div>
+                <div class="test-photo" id="adulterationPhotoContainer">
+                    ${data.adulteration_photo ? 
+                        `<img src="${data.adulteration_photo}" alt="Adulteration Test" onerror="this.parentElement.innerHTML='<div class=\'placeholder\'>⚠️ Photo not found. Please add test photo.</div>'">` : 
+                        `<div class="placeholder">📷 Add test photo in "photos/adulteration-test.jpg"</div>`
+                    }
+                </div>
+            </div>
+        `;
+        
+        contentDiv.innerHTML = html;
+        footerDiv.style.display = 'block';
+        
+        // Update logo if provided
+        if (data.logo_image) {
+            updateLogo(data.logo_image);
+        }
+    }
+
+    // Function to load data from JSON file
+    async function loadData() {
+        try {
+            const response = await fetch('data.json?' + new Date().getTime());
+            
+            if (response.ok) {
+                const data = await response.json();
+                renderReport(data);
+            } else {
+                console.warn('data.json not found, using default values');
+                renderReport(defaultData);
+            }
+        } catch (error) {
+            console.error('Error loading data:', error);
+            renderReport(defaultData);
+        }
+    }
+
+    loadData();
+</script>
+
+</body>
+</html>

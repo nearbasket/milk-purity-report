@@ -1,0 +1,12 @@
+📁 milk-purity-report/          ← YAHAN index.html hai
+│
+├── 📄 index.html
+├── 📄 data.json
+│
+├── 📁 images/                   ← YAHAN logo aur banner
+│   ├── 🖼️ logo.png
+│   └── 🖼️ trust-banner.jpg
+│
+└── 📁 photos/                   ← YAHAN test photos
+    ├── 🖼️ fat-test.jpg
+    └── 🖼️ adulteration-test.jpg
