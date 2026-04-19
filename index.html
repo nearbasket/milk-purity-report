@@ -21,6 +21,7 @@
             align-items: center;
         }
 
+        /* Main Report Card */
         .report-card {
             max-width: 550px;
             width: 100%;
@@ -29,8 +30,14 @@
             border-radius: 32px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1), 0 4px 12px rgba(0, 0, 0, 0.05);
             overflow: hidden;
+            transition: transform 0.2s ease;
         }
 
+        .report-card:hover {
+            transform: translateY(-4px);
+        }
+
+        /* Header Section with Logo */
         .header {
             background: linear-gradient(135deg, #1a5f2a 0%, #0d3b1a 100%);
             padding: 20px 24px;
@@ -58,6 +65,7 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
 
+        /* Agar aapke paas real logo image hai to ye use karein */
         .logo-img img {
             width: 40px;
             height: 40px;
@@ -74,6 +82,7 @@
             font-size: 12px;
             opacity: 0.9;
             margin-top: 4px;
+            font-weight: 500;
         }
 
         .report-title {
@@ -85,10 +94,12 @@
             display: inline-block;
         }
 
+        /* Content Area */
         .content {
             padding: 24px;
         }
 
+        /* Tested By Section with Banner */
         .tested-by-banner {
             position: relative;
             margin-bottom: 24px;
@@ -116,10 +127,6 @@
             border-radius: 20px;
         }
 
-        .tested-by-banner.no-banner .tested-by {
-            background: linear-gradient(135deg, #1b5e20, #2e7d32);
-        }
-
         .tested-by .label {
             font-size: 13px;
             color: #a5d6a7;
@@ -141,6 +148,12 @@
             margin-top: 6px;
         }
 
+        /* No Banner image - Fallback */
+        .tested-by-banner.no-banner .tested-by {
+            background: linear-gradient(135deg, #1b5e20, #2e7d32);
+        }
+
+        /* Date Badge */
         .date-badge {
             text-align: center;
             margin-bottom: 24px;
@@ -156,6 +169,7 @@
             color: #1a237e;
         }
 
+        /* Milk Quality Section */
         .section-title {
             font-size: 18px;
             font-weight: 700;
@@ -176,20 +190,16 @@
         }
 
         .quality-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             padding: 12px 0;
             border-bottom: 1px solid #e5e7eb;
+            flex-wrap: wrap;
         }
 
         .quality-item:last-child {
             border-bottom: none;
-        }
-
-        .quality-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-            flex-wrap: wrap;
         }
 
         .quality-name {
@@ -214,17 +224,14 @@
             margin-left: 10px;
         }
 
-        .quality-status.warning {
-            background: #fff3e0;
-            color: #e65100;
-        }
-
+        /* Progress Bar - FIXED SCALE for Cow Milk */
         .progress-bar-container {
             width: 100%;
-            margin: 8px 0;
+            margin-top: 4px;
+            margin-bottom: 8px;
             background: #e5e7eb;
             border-radius: 10px;
-            height: 10px;
+            height: 8px;
             overflow: hidden;
         }
 
@@ -239,19 +246,11 @@
         .range-hint {
             font-size: 10px;
             color: #9ca3af;
-            margin-top: 4px;
+            text-align: right;
+            margin-top: 2px;
         }
 
-        .clarification {
-            background: #fff8e1;
-            border-left: 3px solid #ffb300;
-            padding: 8px 12px;
-            margin-top: 8px;
-            font-size: 12px;
-            color: #e65100;
-            border-radius: 8px;
-        }
-
+        /* Test Photo Section */
         .photo-section {
             margin-bottom: 24px;
         }
@@ -282,6 +281,7 @@
             width: 100%;
             height: auto;
             display: block;
+            object-fit: cover;
         }
 
         .test-photo .placeholder {
@@ -291,6 +291,7 @@
             font-size: 14px;
         }
 
+        /* Adulteration Tests */
         .test-list {
             background: #fafafa;
             border-radius: 20px;
@@ -304,7 +305,6 @@
             align-items: center;
             padding: 10px 0;
             border-bottom: 1px solid #e5e7eb;
-            flex-wrap: wrap;
         }
 
         .test-item:last-child {
@@ -333,16 +333,7 @@
             color: #c62828;
         }
 
-        .test-clarification {
-            width: 100%;
-            margin-top: 6px;
-            font-size: 11px;
-            color: #e65100;
-            background: #fff8e1;
-            padding: 6px 10px;
-            border-radius: 8px;
-        }
-
+        /* Footer */
         .footer {
             background: #f8fafc;
             padding: 20px 24px;
@@ -362,12 +353,14 @@
             color: #94a3b8;
         }
 
+        /* Loading State */
         .loading {
             text-align: center;
             padding: 40px;
             color: #6b7280;
         }
 
+        /* Responsive */
         @media (max-width: 480px) {
             body {
                 padding: 12px;
@@ -375,8 +368,27 @@
             .content {
                 padding: 18px;
             }
+            .quality-value {
+                font-size: 16px;
+            }
             .brand-name {
                 font-size: 22px;
+            }
+            .logo-img {
+                width: 40px;
+                height: 40px;
+                font-size: 24px;
+            }
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .report-card {
+                box-shadow: none;
+                margin: 0;
             }
         }
     </style>
@@ -386,7 +398,10 @@
 <div class="report-card" id="reportCard">
     <div class="header">
         <div class="logo-container">
-            <div class="logo-img" id="logoContainer"><span>🥛</span></div>
+            <div class="logo-img" id="logoContainer">
+                <!-- Default emoji logo, aap image se replace kar sakte ho -->
+                <span>🥛</span>
+            </div>
             <div class="brand-name">NEARBASKET</div>
         </div>
         <div class="tagline">Fresh Milk Delivered Daily</div>
@@ -408,36 +423,36 @@
 </div>
 
 <script>
-    // ==================== FIXED SCALE: 0% to MAX% ====================
-    function calculatePercentage(value, maxValue) {
-        let percentage = (value / maxValue) * 100;
+    // ==================== FIXED SCALE FOR COW MILK ====================
+    // Cow Milk Standards:
+    // Fat: 3.0% to 6.0% (Rich milk ~4.5%)
+    // SNF: 8.0% to 10.0%
+    // Extra Added Water: 0% to 20% (0% is best)
+    
+    function calculateFatPercentage(fatValue) {
+        // Fat range: 3.0% to 6.0%
+        // 3.0% = 0%, 6.0% = 100%, 4.5% = 50%
+        let min = 3.0;
+        let max = 6.0;
+        let percentage = ((fatValue - min) / (max - min)) * 100;
         return Math.min(100, Math.max(0, percentage));
     }
-
-    // Get clarification message based on values
-    function getFatClarification(fat) {
-        if (fat < 3.5) {
-            return "📝 Clarification: Maybe due to Green Grass - Summer season affects fat naturally.";
-        } else if (fat >= 3.5 && fat < 4.0) {
-            return "📝 Clarification: Good quality. Slightly lower fat may be due to natural feed variation.";
-        }
-        return null;
+    
+    function calculateSNFPercentage(snfValue) {
+        // SNF range: 8.0% to 10.0%
+        // 8.0% = 0%, 10.0% = 100%, 8.7% = 35%
+        let min = 8.0;
+        let max = 10.0;
+        let percentage = ((snfValue - min) / (max - min)) * 100;
+        return Math.min(100, Math.max(0, percentage));
     }
-
-    function getSNFClarification(snf) {
-        if (snf < 8.0) {
-            return "📝 Clarification: SNF slightly low - Natural variation possible. Still good for consumption.";
-        }
-        return null;
-    }
-
-    function getWaterClarification(water) {
-        if (water > 0 && water <= 10) {
-            return "📝 Clarification: Maybe from farmer side on Milk collection - Natural water content variation.";
-        } else if (water > 10) {
-            return "⚠️ Clarification: Water level above acceptable limit - Please contact supplier.";
-        }
-        return null;
+    
+    function calculateWaterPercentage(waterValue) {
+        // Extra Added Water: 0% to 20% (0% is best)
+        // 0% = 100% (good), 20% = 0% (bad)
+        let maxWater = 20.0;
+        let percentage = ((maxWater - waterValue) / maxWater) * 100;
+        return Math.min(100, Math.max(0, percentage));
     }
 
     // Default data
@@ -445,14 +460,11 @@
         date: "2026-01-19",
         fat: 4.5,
         snf: 8.7,
-        extra_added_water: 0,
-        logo_image: null,
-        banner_image: null,
+        extra_added_water: 0,  // Changed from "water" to "extra_added_water"
+        banner_image: null,     // Banner image path (optional)
+        logo_image: null,       // Logo image path (optional)
         fat_photo: null,
         adulteration_photo: null,
-        max_fat: 6.0,
-        max_snf: 10.0,
-        max_water: 10.0,
         tests: {
             added_water: "PASS",
             starch: "PASS",
@@ -461,6 +473,7 @@
         }
     };
 
+    // Function to update logo if image provided
     function updateLogo(logoPath) {
         const logoContainer = document.getElementById('logoContainer');
         if (logoPath && logoPath !== '') {
@@ -468,42 +481,20 @@
         }
     }
 
+    // Function to render the report
     function renderReport(data) {
         const contentDiv = document.getElementById('reportContent');
         const footerDiv = document.getElementById('reportFooter');
         
-        // Calculate percentages (0 to max scale)
-        const maxFat = data.max_fat || 6.0;
-        const maxSnf = data.max_snf || 10.0;
-        const maxWater = data.max_water || 10.0;
+        // Calculate percentages with correct scale
+        const fatPercent = calculateFatPercentage(data.fat);
+        const snfPercent = calculateSNFPercentage(data.snf);
+        const waterPercent = calculateWaterPercentage(data.extra_added_water || 0);
         
-        const fatPercent = calculatePercentage(data.fat, maxFat);
-        const snfPercent = calculatePercentage(data.snf, maxSnf);
-        const waterPercent = calculatePercentage(maxWater - (data.extra_added_water || 0), maxWater);
-        
-        // Get clarifications
-        const fatClarification = getFatClarification(data.fat);
-        const snfClarification = getSNFClarification(data.snf);
-        const waterClarification = getWaterClarification(data.extra_added_water || 0);
-        
-        // Fat status
-        const fatStatus = data.fat >= 4.0 ? "⭐ Rich Quality" : (data.fat >= 3.2 ? "✓ Standard" : "⚠️ Low");
-        const fatStatusClass = data.fat >= 3.2 ? "" : "warning";
-        
-        // SNF status
-        const snfStatus = data.snf >= 8.5 ? "⭐ Good" : (data.snf >= 8.0 ? "✓ Standard" : "⚠️ Low");
-        const snfStatusClass = data.snf >= 8.0 ? "" : "warning";
-        
-        // Water status
-        const waterValue = data.extra_added_water || 0;
-        const waterStatus = waterValue === 0 ? "✅ No added water" : (waterValue <= 10 ? "⚠️ Trace detected" : "❌ High water detected");
-        const waterStatusClass = waterValue === 0 ? "" : "warning";
-        
-        // Adulteration test: If water > 0, then "Added Water" test should FAIL
-        let tests = { ...data.tests };
-        if (waterValue > 0) {
-            tests.added_water = "FAIL";
-        }
+        // Get range hints
+        const fatHint = data.fat >= 4.2 ? "⭐ Rich Quality" : (data.fat >= 3.5 ? "✓ Standard" : "⚠️ Low");
+        const snfHint = data.snf >= 8.5 ? "⭐ Good" : (data.snf >= 8.0 ? "✓ Standard" : "⚠️ Low");
+        const waterHint = (data.extra_added_water || 0) === 0 ? "✅ No added water" : `⚠️ ${data.extra_added_water}% detected`;
         
         // Banner HTML
         const bannerHtml = data.banner_image && data.banner_image !== '' 
@@ -524,62 +515,52 @@
         const html = `
             ${testedByHtml}
 
+            <!-- Date -->
             <div class="date-badge">
                 <div class="date">📅 ${data.date} | Tested Fresh at 5:30 AM</div>
             </div>
 
+            <!-- Milk Quality Section -->
             <div class="section-title">
                 <span>📊</span> TODAY'S RESULTS
             </div>
 
             <div class="quality-grid">
-                <!-- FAT -->
                 <div class="quality-item">
-                    <div class="quality-header">
-                        <div>
-                            <span class="quality-name">🥛 Fat</span>
-                            <span class="quality-status ${fatStatusClass}">${fatStatus}</span>
-                        </div>
-                        <div class="quality-value">${data.fat}%</div>
+                    <div>
+                        <span class="quality-name">🥛 Fat</span>
+                        <span class="quality-status">${fatHint}</span>
                     </div>
-                    <div class="progress-bar-container">
-                        <div class="progress-bar" style="width: ${fatPercent}%"></div>
-                    </div>
-                    <div class="range-hint">Scale: 0% to ${maxFat}% | Current: ${data.fat}%</div>
-                    ${fatClarification ? `<div class="clarification">${fatClarification}</div>` : ''}
+                    <div class="quality-value">${data.fat}%</div>
                 </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" style="width: ${fatPercent}%"></div>
+                </div>
+                <div class="range-hint">Cow Milk Range: 3.0% - 6.0%</div>
 
-                <!-- SNF -->
                 <div class="quality-item">
-                    <div class="quality-header">
-                        <div>
-                            <span class="quality-name">⚪ SNF (Solid Non Fat)</span>
-                            <span class="quality-status ${snfStatusClass}">${snfStatus}</span>
-                        </div>
-                        <div class="quality-value">${data.snf}%</div>
+                    <div>
+                        <span class="quality-name">⚪ SNF (Solid Non Fat)</span>
+                        <span class="quality-status">${snfHint}</span>
                     </div>
-                    <div class="progress-bar-container">
-                        <div class="progress-bar" style="width: ${snfPercent}%"></div>
-                    </div>
-                    <div class="range-hint">Scale: 0% to ${maxSnf}% | Current: ${data.snf}%</div>
-                    ${snfClarification ? `<div class="clarification">${snfClarification}</div>` : ''}
+                    <div class="quality-value">${data.snf}%</div>
                 </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" style="width: ${snfPercent}%"></div>
+                </div>
+                <div class="range-hint">Cow Milk Range: 8.0% - 10.0%</div>
 
-                <!-- Extra Added Water -->
                 <div class="quality-item">
-                    <div class="quality-header">
-                        <div>
-                            <span class="quality-name">💧 Extra Added Water</span>
-                            <span class="quality-status ${waterStatusClass}">${waterStatus}</span>
-                        </div>
-                        <div class="quality-value">${waterValue}%</div>
+                    <div>
+                        <span class="quality-name">💧 Extra Added Water</span>
+                        <span class="quality-status">${waterHint}</span>
                     </div>
-                    <div class="progress-bar-container">
-                        <div class="progress-bar" style="width: ${waterPercent}%"></div>
-                    </div>
-                    <div class="range-hint">Scale: 0% to ${maxWater}% | 0% = No Adulteration</div>
-                    ${waterClarification ? `<div class="clarification">${waterClarification}</div>` : ''}
+                    <div class="quality-value">${data.extra_added_water || 0}%</div>
                 </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" style="width: ${waterPercent}%"></div>
+                </div>
+                <div class="range-hint">0% = No Adulteration | Lower is Better</div>
             </div>
 
             <!-- Fat/SNF Test Photo -->
@@ -587,9 +568,9 @@
                 <div class="photo-label">
                     <span>📸</span> FAT & SNF TEST PHOTO
                 </div>
-                <div class="test-photo">
+                <div class="test-photo" id="fatPhotoContainer">
                     ${data.fat_photo ? 
-                        `<img src="${data.fat_photo}" alt="Fat and SNF Test" onerror="this.parentElement.innerHTML='<div class=\'placeholder\'>⚠️ Photo not found</div>'">` : 
+                        `<img src="${data.fat_photo}" alt="Fat and SNF Test" onerror="this.parentElement.innerHTML='<div class=\'placeholder\'>⚠️ Photo not found. Please add test photo.</div>'">` : 
                         `<div class="placeholder">📷 Add test photo in "photos/fat-test.jpg"</div>`
                     }
                 </div>
@@ -602,23 +583,20 @@
 
             <div class="test-list">
                 <div class="test-item">
-                    <div>
-                        <span class="test-name">💧 No Added Water</span>
-                        ${waterValue > 0 ? `<div class="test-clarification">📝 ${waterClarification || "Trace water detected - Natural collection variation"}</div>` : ''}
-                    </div>
-                    <span class="test-result ${tests.added_water === 'PASS' ? 'pass' : 'fail'}">${tests.added_water === 'PASS' ? '✓ PASS' : '✗ FAIL'}</span>
+                    <span class="test-name">💧 No Added Water</span>
+                    <span class="test-result ${data.tests.added_water === 'PASS' ? 'pass' : 'fail'}">✓ ${data.tests.added_water}</span>
                 </div>
                 <div class="test-item">
                     <span class="test-name">🌾 No Starch</span>
-                    <span class="test-result ${tests.starch === 'PASS' ? 'pass' : 'fail'}">${tests.starch === 'PASS' ? '✓ PASS' : '✗ FAIL'}</span>
+                    <span class="test-result ${data.tests.starch === 'PASS' ? 'pass' : 'fail'}">✓ ${data.tests.starch}</span>
                 </div>
                 <div class="test-item">
                     <span class="test-name">🧪 No Urea</span>
-                    <span class="test-result ${tests.urea === 'PASS' ? 'pass' : 'fail'}">${tests.urea === 'PASS' ? '✓ PASS' : '✗ FAIL'}</span>
+                    <span class="test-result ${data.tests.urea === 'PASS' ? 'pass' : 'fail'}">✓ ${data.tests.urea}</span>
                 </div>
                 <div class="test-item">
                     <span class="test-name">🧼 No Detergent</span>
-                    <span class="test-result ${tests.detergent === 'PASS' ? 'pass' : 'fail'}">${tests.detergent === 'PASS' ? '✓ PASS' : '✗ FAIL'}</span>
+                    <span class="test-result ${data.tests.detergent === 'PASS' ? 'pass' : 'fail'}">✓ ${data.tests.detergent}</span>
                 </div>
             </div>
 
@@ -627,9 +605,9 @@
                 <div class="photo-label">
                     <span>📸</span> ADULTERATION TEST PHOTO
                 </div>
-                <div class="test-photo">
+                <div class="test-photo" id="adulterationPhotoContainer">
                     ${data.adulteration_photo ? 
-                        `<img src="${data.adulteration_photo}" alt="Adulteration Test" onerror="this.parentElement.innerHTML='<div class=\'placeholder\'>⚠️ Photo not found</div>'">` : 
+                        `<img src="${data.adulteration_photo}" alt="Adulteration Test" onerror="this.parentElement.innerHTML='<div class=\'placeholder\'>⚠️ Photo not found. Please add test photo.</div>'">` : 
                         `<div class="placeholder">📷 Add test photo in "photos/adulteration-test.jpg"</div>`
                     }
                 </div>
@@ -639,22 +617,26 @@
         contentDiv.innerHTML = html;
         footerDiv.style.display = 'block';
         
+        // Update logo if provided
         if (data.logo_image) {
             updateLogo(data.logo_image);
         }
     }
 
+    // Function to load data from JSON file
     async function loadData() {
         try {
             const response = await fetch('data.json?' + new Date().getTime());
+            
             if (response.ok) {
                 const data = await response.json();
                 renderReport(data);
             } else {
+                console.warn('data.json not found, using default values');
                 renderReport(defaultData);
             }
         } catch (error) {
-            console.error('Error:', error);
+            console.error('Error loading data:', error);
             renderReport(defaultData);
         }
     }
