@@ -425,15 +425,15 @@
 <script>
     // ==================== FIXED SCALE FOR COW MILK ====================
     // Cow Milk Standards:
-    // Fat: 3.0% to 6.0% (Rich milk ~4.5%)
+    // Fat: 3.0% to 4.5% (Rich milk ~4.5%)
     // SNF: 8.0% to 10.0%
     // Extra Added Water: 0% to 20% (0% is best)
     
     function calculateFatPercentage(fatValue) {
-        // Fat range: 3.0% to 6.0%
-        // 3.0% = 0%, 6.0% = 100%, 4.5% = 50%
+        // Fat range: 3.0% to 4.5%
+        // 3.0% = 0%, 4.5% = 100%, 3.7% = 50%
         let min = 3.0;
-        let max = 6.0;
+        let max = 4.5;
         let percentage = ((fatValue - min) / (max - min)) * 100;
         return Math.min(100, Math.max(0, percentage));
     }
@@ -492,7 +492,7 @@
         const waterPercent = calculateWaterPercentage(data.extra_added_water || 0);
         
         // Get range hints
-        const fatHint = data.fat >= 4.2 ? "⭐ Rich Quality" : (data.fat >= 3.5 ? "✓ Standard" : "⚠️ Low");
+        const fatHint = data.fat >= 4.2 ? "⭐ Rich Quality" : (data.fat >= 3.0 ? "✓ Standard" : "⚠️ Low");
         const snfHint = data.snf >= 8.5 ? "⭐ Good" : (data.snf >= 8.0 ? "✓ Standard" : "⚠️ Low");
         const waterHint = (data.extra_added_water || 0) === 0 ? "✅ No added water" : `⚠️ ${data.extra_added_water}% detected`;
         
@@ -517,7 +517,7 @@
 
             <!-- Date -->
             <div class="date-badge">
-                <div class="date">📅 ${data.date} | Tested Fresh at 5:30 AM</div>
+                <div class="date">📅 ${data.date} | </div>
             </div>
 
             <!-- Milk Quality Section -->
