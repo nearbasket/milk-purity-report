@@ -9,8 +9,8 @@
   "adulteration_photo": "photos/adulteration-test.jpg",
   "tests": {
     "added_water": "SLIGHT WATER DETECTED BUT MAYBE DUE TO HANDLING",
-    "starch": "NOT TESTED TODAY",
-    "urea": "NOT TESTED TODAY",
-    "detergent": "NOT TESTED TODAY"
+    "starch": "PASS",
+    "urea": "PASS",
+    "detergent": "PASS"
   }
 }
