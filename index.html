@@ -255,13 +255,11 @@
             gap: 6px;
         }
 
-        /* Image Container with Overlay */
         .image-container {
             position: relative;
             width: 100%;
             border-radius: 20px;
             overflow: hidden;
-            background: #f3f4f6;
         }
 
         .image-container img {
@@ -290,6 +288,9 @@
             border-radius: 20px;
             background: #f3f4f6;
             min-height: 180px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             border: 1px solid #e5e7eb;
             overflow: hidden;
         }
@@ -385,6 +386,10 @@
                 height: 40px;
                 font-size: 24px;
             }
+            .image-overlay {
+                font-size: 9px;
+                padding: 25px 8px 6px 8px;
+            }
         }
 
         @media print {
@@ -428,9 +433,38 @@
 </div>
 
 <script>
+    // ==================== COW MILK FIXED RANGE ====================
+    // Cow Milk Standards (CORRECTED):
+    // Fat: 3.0% to 4.5% (not 6%)
+    // SNF: 8.0% to 10.0%
+    // Extra Added Water: 0% to 20% (0% is best)
+    
+    function calculateFatPercentage(fatValue) {
+        // Fat range: 3.0% to 4.5%
+        // 3.0% = 0%, 4.5% = 100%
+        let min = 3.0;
+        let max = 4.5;
+        let percentage = ((fatValue - min) / (max - min)) * 100;
+        return Math.min(100, Math.max(0, percentage));
+    }
+    
+    function calculateSNFPercentage(snfValue) {
+        // SNF range: 8.0% to 10.0%
+        let min = 8.0;
+        let max = 10.0;
+        let percentage = ((snfValue - min) / (max - min)) * 100;
+        return Math.min(100, Math.max(0, percentage));
+    }
+    
+    function calculateWaterPercentage(waterValue) {
+        // Extra Added Water: 0% to 20% (0% is best)
+        let maxWater = 20.0;
+        let percentage = ((maxWater - waterValue) / maxWater) * 100;
+        return Math.min(100, Math.max(0, percentage));
+    }
+    
     // ==================== HELPER FUNCTIONS ====================
     
-    // Get current date in IST for display
     function getFormattedDateIST() {
         const now = new Date();
         const istOffset = 5.5 * 60 * 60 * 1000;
@@ -444,19 +478,17 @@
         return `${day} ${month} ${year}`;
     }
     
-    // Get INDIVIDUAL image last modified time
-    async function getIndividualImageTimestamp(imageUrl) {
+    // Get LAST MODIFIED TIME for a SPECIFIC image (individual call)
+    async function getSpecificImageModifiedTime(imageUrl) {
         try {
-            // Add cache buster to get fresh headers for EACH image
-            const response = await fetch(imageUrl + '?cb=' + new Date().getTime(), { 
-                method: 'HEAD',
-                cache: 'no-cache'
-            });
+            // Add cache buster to get fresh headers
+            const uniqueUrl = imageUrl + '?v=' + new Date().getTime();
+            const response = await fetch(uniqueUrl, { method: 'HEAD' });
             const lastModified = response.headers.get('Last-Modified');
             
             if (lastModified) {
                 const date = new Date(lastModified);
-                // Convert to IST (UTC+5:30)
+                // Convert to IST
                 const istOffset = 5.5 * 60 * 60 * 1000;
                 const istDate = new Date(date.getTime() + istOffset);
                 
@@ -473,11 +505,11 @@
         } catch (e) {
             console.warn('Could not fetch modified time for:', imageUrl, e);
         }
-        // Fallback: use current time
-        return getCurrentTimeFallback();
+        return null;
     }
     
-    function getCurrentTimeFallback() {
+    // Fallback when modified time not available
+    function getFallbackOverlayText() {
         const now = new Date();
         const istOffset = 5.5 * 60 * 60 * 1000;
         const istDate = new Date(now.getTime() + istOffset);
@@ -493,61 +525,37 @@
         return `📸 Verified on ${day}-${month}-${year} at ${hours}:${minutes} ${ampm} IST`;
     }
     
-    // Load a single image with its own timestamp
-    async function loadImageWithTimestamp(imageUrl, containerId, altText) {
-        const container = document.getElementById(containerId);
-        if (!container) return;
+    // Create image HTML with loading overlay
+    function createImageWithOverlay(imageUrl, altText, imageId) {
+        if (!imageUrl) return `<div class="placeholder">📷 No test photo available</div>`;
         
-        // Show loading state
-        container.innerHTML = `
-            <div class="image-container">
-                <img src="${imageUrl}" alt="${altText}" onerror="this.parentElement.innerHTML='<div class=\\'placeholder\\'>⚠️ Photo not found: ${imageUrl}</div>'">
-                <div class="image-overlay">⏳ Loading timestamp...</div>
+        return `
+            <div class="image-container" data-image-url="${imageUrl}" data-image-id="${imageId}">
+                <img src="${imageUrl}" alt="${altText}" onerror="this.parentElement.innerHTML='<div class=\'placeholder\'>⚠️ Photo not found: ${imageUrl}</div>'">
+                <div class="image-overlay" id="overlay-${imageId}">⏳ Loading timestamp...</div>
             </div>
         `;
+    }
+    
+    // Update INDIVIDUAL image overlay with its own timestamp
+    async function updateIndividualImageOverlay(imageUrl, imageId) {
+        const overlayElement = document.getElementById(`overlay-${imageId}`);
+        if (!overlayElement) return;
         
-        // Wait for image to load (optional but better UX)
-        const img = container.querySelector('img');
-        if (img) {
-            await new Promise((resolve) => {
-                if (img.complete) resolve();
-                else img.onload = resolve;
-                img.onerror = resolve;
-            });
+        // Get this specific image's modified time
+        let timestamp = await getSpecificImageModifiedTime(imageUrl);
+        
+        // If no modified time found, use fallback
+        if (!timestamp) {
+            timestamp = getFallbackOverlayText();
         }
         
-        // Get THIS image's individual timestamp
-        const timestamp = await getIndividualImageTimestamp(imageUrl);
-        
-        // Update overlay for THIS image only
-        const overlay = container.querySelector('.image-overlay');
-        if (overlay) {
-            overlay.textContent = timestamp;
-        }
-    }
-    
-    // ==================== SCALE FUNCTIONS (Cow Milk) ====================
-    function calculateFatPercentage(fatValue) {
-        let min = 3.0, max = 6.0;
-        let percentage = ((fatValue - min) / (max - min)) * 100;
-        return Math.min(100, Math.max(0, percentage));
-    }
-    
-    function calculateSNFPercentage(snfValue) {
-        let min = 8.0, max = 10.0;
-        let percentage = ((snfValue - min) / (max - min)) * 100;
-        return Math.min(100, Math.max(0, percentage));
-    }
-    
-    function calculateWaterPercentage(waterValue) {
-        let maxWater = 20.0;
-        let percentage = ((maxWater - waterValue) / maxWater) * 100;
-        return Math.min(100, Math.max(0, percentage));
+        overlayElement.textContent = timestamp;
     }
     
     // ==================== DEFAULT DATA ====================
     const defaultData = {
-        fat: 4.5,
+        fat: 4.2,
         snf: 8.7,
         extra_added_water: 0,
         banner_image: null,
@@ -573,17 +581,16 @@
         const contentDiv = document.getElementById('reportContent');
         const footerDiv = document.getElementById('reportFooter');
         
-        // Auto date - today's date
         const formattedDate = getFormattedDateIST();
         
-        // Calculate percentages
+        // Calculate percentages with CORRECTED ranges
         const fatPercent = calculateFatPercentage(data.fat);
         const snfPercent = calculateSNFPercentage(data.snf);
         const waterPercent = calculateWaterPercentage(data.extra_added_water || 0);
         
-        // Range hints
-        const fatHint = data.fat >= 4.2 ? "⭐ Rich Quality" : (data.fat >= 3.5 ? "✓ Standard" : "⚠️ Low");
-        const snfHint = data.snf >= 8.5 ? "⭐ Good" : (data.snf >= 8.0 ? "✓ Standard" : "⚠️ Low");
+        // Range hints with corrected ranges
+        const fatHint = data.fat >= 4.0 ? "⭐ Premium Rich" : (data.fat >= 3.5 ? "✓ Good Quality" : (data.fat >= 3.0 ? "✓ Standard" : "⚠️ Low"));
+        const snfHint = data.snf >= 8.7 ? "⭐ Excellent" : (data.snf >= 8.5 ? "✓ Good" : (data.snf >= 8.0 ? "✓ Standard" : "⚠️ Low"));
         const waterHint = (data.extra_added_water || 0) === 0 ? "✅ No added water" : `⚠️ ${data.extra_added_water}% detected`;
         
         // Banner HTML
@@ -602,13 +609,17 @@
             </div>
         `;
         
-        // Create placeholders for images (will load asynchronously)
+        // Unique IDs for each image overlay
+        const fatPhotoId = 'fatPhoto_' + Date.now();
+        const adPhotoId = 'adPhoto_' + Date.now();
+        
+        // Create photo HTML
         const fatPhotoHtml = data.fat_photo ? 
-            `<div class="test-photo" id="fatPhotoContainer"></div>` :
+            `<div class="test-photo" id="fatPhotoContainer">${createImageWithOverlay(data.fat_photo, "Fat & SNF Test", fatPhotoId)}</div>` :
             `<div class="test-photo"><div class="placeholder">📷 No fat test photo available</div></div>`;
         
         const adulterationPhotoHtml = data.adulteration_photo ?
-            `<div class="test-photo" id="adulterationPhotoContainer"></div>` :
+            `<div class="test-photo" id="adulterationPhotoContainer">${createImageWithOverlay(data.adulteration_photo, "Adulteration Test", adPhotoId)}</div>` :
             `<div class="test-photo"><div class="placeholder">📷 No adulteration test photo available</div></div>`;
         
         const html = `
@@ -633,7 +644,7 @@
                 <div class="progress-bar-container">
                     <div class="progress-bar" style="width: ${fatPercent}%"></div>
                 </div>
-                <div class="range-hint">Cow Milk Range: 3.0% - 6.0%</div>
+                <div class="range-hint">Cow Milk Range: 3.0% - 4.5% | ${data.fat >= 4.0 ? '⭐ Premium' : (data.fat >= 3.5 ? '✓ Good' : 'Standard')}</div>
                 
                 <div class="quality-item">
                     <div>
@@ -706,13 +717,13 @@
             updateLogo(data.logo_image);
         }
         
-        // Load EACH image INDEPENDENTLY with its own timestamp
+        // Update EACH image overlay INDIVIDUALLY with its own timestamp
         if (data.fat_photo) {
-            loadImageWithTimestamp(data.fat_photo, 'fatPhotoContainer', 'Fat & SNF Test');
+            updateIndividualImageOverlay(data.fat_photo, fatPhotoId);
         }
         
         if (data.adulteration_photo) {
-            loadImageWithTimestamp(data.adulteration_photo, 'adulterationPhotoContainer', 'Adulteration Test');
+            updateIndividualImageOverlay(data.adulteration_photo, adPhotoId);
         }
     }
     
