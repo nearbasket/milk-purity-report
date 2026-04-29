@@ -21,7 +21,6 @@
             align-items: center;
         }
 
-        /* Main Report Card */
         .report-card {
             max-width: 550px;
             width: 100%;
@@ -37,7 +36,6 @@
             transform: translateY(-4px);
         }
 
-        /* Header Section with Logo */
         .header {
             background: linear-gradient(135deg, #1a5f2a 0%, #0d3b1a 100%);
             padding: 20px 24px;
@@ -65,7 +63,6 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
 
-        /* Agar aapke paas real logo image hai to ye use karein */
         .logo-img img {
             width: 40px;
             height: 40px;
@@ -94,12 +91,10 @@
             display: inline-block;
         }
 
-        /* Content Area */
         .content {
             padding: 24px;
         }
 
-        /* Tested By Section with Banner */
         .tested-by-banner {
             position: relative;
             margin-bottom: 24px;
@@ -148,12 +143,10 @@
             margin-top: 6px;
         }
 
-        /* No Banner image - Fallback */
         .tested-by-banner.no-banner .tested-by {
             background: linear-gradient(135deg, #1b5e20, #2e7d32);
         }
 
-        /* Date Badge */
         .date-badge {
             text-align: center;
             margin-bottom: 24px;
@@ -169,7 +162,6 @@
             color: #1a237e;
         }
 
-        /* Milk Quality Section */
         .section-title {
             font-size: 18px;
             font-weight: 700;
@@ -224,7 +216,6 @@
             margin-left: 10px;
         }
 
-        /* Progress Bar - FIXED SCALE for Cow Milk */
         .progress-bar-container {
             width: 100%;
             margin-top: 4px;
@@ -250,7 +241,6 @@
             margin-top: 2px;
         }
 
-        /* Test Photo Section */
         .photo-section {
             margin-bottom: 24px;
         }
@@ -265,6 +255,35 @@
             gap: 6px;
         }
 
+        /* Image Container with Overlay */
+        .image-container {
+            position: relative;
+            width: 100%;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .image-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .image-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0,0,0,0.85));
+            color: white;
+            padding: 30px 12px 10px 12px;
+            font-size: 11px;
+            font-weight: 500;
+            text-align: center;
+            font-family: monospace;
+            letter-spacing: 0.5px;
+        }
+
         .test-photo {
             width: 100%;
             border-radius: 20px;
@@ -277,13 +296,6 @@
             overflow: hidden;
         }
 
-        .test-photo img {
-            width: 100%;
-            height: auto;
-            display: block;
-            object-fit: cover;
-        }
-
         .test-photo .placeholder {
             color: #9ca3af;
             text-align: center;
@@ -291,7 +303,6 @@
             font-size: 14px;
         }
 
-        /* Adulteration Tests */
         .test-list {
             background: #fafafa;
             border-radius: 20px;
@@ -333,7 +344,6 @@
             color: #c62828;
         }
 
-        /* Footer */
         .footer {
             background: #f8fafc;
             padding: 20px 24px;
@@ -353,14 +363,12 @@
             color: #94a3b8;
         }
 
-        /* Loading State */
         .loading {
             text-align: center;
             padding: 40px;
             color: #6b7280;
         }
 
-        /* Responsive */
         @media (max-width: 480px) {
             body {
                 padding: 12px;
@@ -399,7 +407,6 @@
     <div class="header">
         <div class="logo-container">
             <div class="logo-img" id="logoContainer">
-                <!-- Default emoji logo, aap image se replace kar sakte ho -->
                 <span>🥛</span>
             </div>
             <div class="brand-name">NEARBASKET</div>
@@ -423,46 +430,129 @@
 </div>
 
 <script>
-    // ==================== FIXED SCALE FOR COW MILK ====================
-    // Cow Milk Standards:
-    // Fat: 3.0% to 4.5% (Rich milk ~4.5%)
-    // SNF: 8.0% to 10.0%
-    // Extra Added Water: 0% to 20% (0% is best)
+    // ==================== HELPER FUNCTIONS ====================
     
+    // Format date to Indian format (DD-MM-YYYY)
+    function getCurrentDateIST() {
+        const now = new Date();
+        // Convert to IST (UTC+5:30)
+        const istOffset = 5.5 * 60 * 60 * 1000;
+        const istDate = new Date(now.getTime() + istOffset);
+        
+        const day = String(istDate.getUTCDate()).padStart(2, '0');
+        const month = String(istDate.getUTCMonth() + 1).padStart(2, '0');
+        const year = istDate.getUTCFullYear();
+        
+        return `${day}-${month}-${year}`;
+    }
+    
+    function getFormattedDateIST() {
+        const now = new Date();
+        const istOffset = 5.5 * 60 * 60 * 1000;
+        const istDate = new Date(now.getTime() + istOffset);
+        
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const day = istDate.getUTCDate();
+        const month = months[istDate.getUTCMonth()];
+        const year = istDate.getUTCFullYear();
+        
+        return `${day} ${month} ${year}`;
+    }
+    
+    // Get image last modified time via fetch
+    async function getImageModifiedTime(imageUrl) {
+        try {
+            // Add cache buster to get fresh headers
+            const response = await fetch(imageUrl + '?t=' + new Date().getTime(), { method: 'HEAD' });
+            const lastModified = response.headers.get('Last-Modified');
+            
+            if (lastModified) {
+                const date = new Date(lastModified);
+                // Convert to IST
+                const istOffset = 5.5 * 60 * 60 * 1000;
+                const istDate = new Date(date.getTime() + istOffset);
+                
+                const day = String(istDate.getUTCDate()).padStart(2, '0');
+                const month = String(istDate.getUTCMonth() + 1).padStart(2, '0');
+                const year = istDate.getUTCFullYear();
+                let hours = istDate.getUTCHours();
+                const minutes = String(istDate.getUTCMinutes()).padStart(2, '0');
+                const ampm = hours >= 12 ? 'PM' : 'AM';
+                hours = hours % 12 || 12;
+                
+                return `📸 Tested on ${day}-${month}-${year} at ${hours}:${minutes} ${ampm} IST`;
+            }
+        } catch (e) {
+            console.warn('Could not fetch modified time:', imageUrl, e);
+        }
+        // Fallback: use current date/time
+        return getFallbackOverlayText();
+    }
+    
+    function getFallbackOverlayText() {
+        const now = new Date();
+        const istOffset = 5.5 * 60 * 60 * 1000;
+        const istDate = new Date(now.getTime() + istOffset);
+        
+        const day = String(istDate.getUTCDate()).padStart(2, '0');
+        const month = String(istDate.getUTCMonth() + 1).padStart(2, '0');
+        const year = istDate.getUTCFullYear();
+        let hours = istDate.getUTCHours();
+        const minutes = String(istDate.getUTCMinutes()).padStart(2, '0');
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12 || 12;
+        
+        return `📸 Verified on ${day}-${month}-${year} at ${hours}:${minutes} ${ampm} IST`;
+    }
+    
+    // Create image HTML with overlay
+    function createImageWithOverlay(imageUrl, altText) {
+        if (!imageUrl) return `<div class="placeholder">📷 No test photo available</div>`;
+        
+        return `
+            <div class="image-container" data-image-url="${imageUrl}">
+                <img src="${imageUrl}" alt="${altText}" onerror="this.parentElement.innerHTML='<div class=\'placeholder\'>⚠️ Photo not found: ${imageUrl}</div>'">
+                <div class="image-overlay loading-overlay">⏳ Loading test timestamp...</div>
+            </div>
+        `;
+    }
+    
+    // Update overlay with actual timestamp
+    async function updateImageOverlay(container, imageUrl) {
+        const overlay = container.querySelector('.image-overlay');
+        if (overlay) {
+            const timestamp = await getImageModifiedTime(imageUrl);
+            overlay.textContent = timestamp;
+            overlay.classList.remove('loading-overlay');
+        }
+    }
+    
+    // ==================== SCALE FUNCTIONS (Cow Milk) ====================
     function calculateFatPercentage(fatValue) {
-        // Fat range: 3.0% to 4.5%
-        // 3.0% = 0%, 4.5% = 100%, 3.7% = 50%
-        let min = 3.0;
-        let max = 4.5;
+        let min = 3.0, max = 6.0;
         let percentage = ((fatValue - min) / (max - min)) * 100;
         return Math.min(100, Math.max(0, percentage));
     }
     
     function calculateSNFPercentage(snfValue) {
-        // SNF range: 8.0% to 10.0%
-        // 8.0% = 0%, 10.0% = 100%, 8.7% = 35%
-        let min = 8.0;
-        let max = 10.0;
+        let min = 8.0, max = 10.0;
         let percentage = ((snfValue - min) / (max - min)) * 100;
         return Math.min(100, Math.max(0, percentage));
     }
     
     function calculateWaterPercentage(waterValue) {
-        // Extra Added Water: 0% to 20% (0% is best)
-        // 0% = 100% (good), 20% = 0% (bad)
         let maxWater = 20.0;
         let percentage = ((maxWater - waterValue) / maxWater) * 100;
         return Math.min(100, Math.max(0, percentage));
     }
-
-    // Default data
+    
+    // ==================== DEFAULT DATA (No date field needed) ====================
     const defaultData = {
-        date: "2026-01-19",
         fat: 4.5,
         snf: 8.7,
-        extra_added_water: 0,  // Changed from "water" to "extra_added_water"
-        banner_image: null,     // Banner image path (optional)
-        logo_image: null,       // Logo image path (optional)
+        extra_added_water: 0,
+        banner_image: null,
+        logo_image: null,
         fat_photo: null,
         adulteration_photo: null,
         tests: {
@@ -472,27 +562,29 @@
             detergent: "PASS"
         }
     };
-
-    // Function to update logo if image provided
+    
     function updateLogo(logoPath) {
         const logoContainer = document.getElementById('logoContainer');
         if (logoPath && logoPath !== '') {
             logoContainer.innerHTML = `<img src="${logoPath}" alt="NearBasket Logo" onerror="this.parentElement.innerHTML='<span>🥛</span>'">`;
         }
     }
-
-    // Function to render the report
-    function renderReport(data) {
+    
+    async function renderReport(data) {
         const contentDiv = document.getElementById('reportContent');
         const footerDiv = document.getElementById('reportFooter');
         
-        // Calculate percentages with correct scale
+        // Auto date - today's date
+        const todayDate = getCurrentDateIST();
+        const formattedDate = getFormattedDateIST();
+        
+        // Calculate percentages
         const fatPercent = calculateFatPercentage(data.fat);
         const snfPercent = calculateSNFPercentage(data.snf);
         const waterPercent = calculateWaterPercentage(data.extra_added_water || 0);
         
-        // Get range hints
-        const fatHint = data.fat >= 4.2 ? "⭐ Rich Quality" : (data.fat >= 3.0 ? "✓ Standard" : "⚠️ Low");
+        // Range hints
+        const fatHint = data.fat >= 4.2 ? "⭐ Rich Quality" : (data.fat >= 3.5 ? "✓ Standard" : "⚠️ Low");
         const snfHint = data.snf >= 8.5 ? "⭐ Good" : (data.snf >= 8.0 ? "✓ Standard" : "⚠️ Low");
         const waterHint = (data.extra_added_water || 0) === 0 ? "✅ No added water" : `⚠️ ${data.extra_added_water}% detected`;
         
@@ -512,19 +604,26 @@
             </div>
         `;
         
+        // Create photo HTML containers (will be updated async)
+        const fatPhotoHtml = data.fat_photo ? 
+            `<div class="test-photo" id="fatPhotoContainer">${createImageWithOverlay(data.fat_photo, "Fat & SNF Test")}</div>` :
+            `<div class="test-photo"><div class="placeholder">📷 No fat test photo available</div></div>`;
+        
+        const adulterationPhotoHtml = data.adulteration_photo ?
+            `<div class="test-photo" id="adulterationPhotoContainer">${createImageWithOverlay(data.adulteration_photo, "Adulteration Test")}</div>` :
+            `<div class="test-photo"><div class="placeholder">📷 No adulteration test photo available</div></div>`;
+        
         const html = `
             ${testedByHtml}
-
-            <!-- Date -->
+            
             <div class="date-badge">
-                <div class="date">📅 ${data.date} </div>
+                <div class="date">📅 Report: ${formattedDate} | Tested Fresh Daily</div>
             </div>
-
-            <!-- Milk Quality Section -->
+            
             <div class="section-title">
                 <span>📊</span> TODAY'S RESULTS
             </div>
-
+            
             <div class="quality-grid">
                 <div class="quality-item">
                     <div>
@@ -536,8 +635,8 @@
                 <div class="progress-bar-container">
                     <div class="progress-bar" style="width: ${fatPercent}%"></div>
                 </div>
-                <div class="range-hint">Cow Milk Range: 3.0% - 4.5%</div>
-
+                <div class="range-hint">Cow Milk Range: 3.0% - 6.0%</div>
+                
                 <div class="quality-item">
                     <div>
                         <span class="quality-name">⚪ SNF (Solid Non Fat)</span>
@@ -549,7 +648,7 @@
                     <div class="progress-bar" style="width: ${snfPercent}%"></div>
                 </div>
                 <div class="range-hint">Cow Milk Range: 8.0% - 10.0%</div>
-
+                
                 <div class="quality-item">
                     <div>
                         <span class="quality-name">💧 Extra Added Water</span>
@@ -562,25 +661,18 @@
                 </div>
                 <div class="range-hint">0% = No Adulteration | Lower is Better</div>
             </div>
-
-            <!-- Fat/SNF Test Photo -->
+            
             <div class="photo-section">
                 <div class="photo-label">
                     <span>📸</span> FAT & SNF TEST PHOTO
                 </div>
-                <div class="test-photo" id="fatPhotoContainer">
-                    ${data.fat_photo ? 
-                        `<img src="${data.fat_photo}" alt="Fat and SNF Test" onerror="this.parentElement.innerHTML='<div class=\'placeholder\'>⚠️ Photo not found. Please add test photo.</div>'">` : 
-                        `<div class="placeholder">📷 Add test photo in "photos/fat-test.jpg"</div>`
-                    }
-                </div>
+                ${fatPhotoHtml}
             </div>
-
-            <!-- Adulteration Tests -->
+            
             <div class="section-title">
                 <span>🧪</span> ADULTERATION TESTS
             </div>
-
+            
             <div class="test-list">
                 <div class="test-item">
                     <span class="test-name">💧 No Added Water</span>
@@ -599,18 +691,12 @@
                     <span class="test-result ${data.tests.detergent === 'PASS' ? 'pass' : 'fail'}">✓ ${data.tests.detergent}</span>
                 </div>
             </div>
-
-            <!-- Adulteration Test Photo -->
+            
             <div class="photo-section">
                 <div class="photo-label">
                     <span>📸</span> ADULTERATION TEST PHOTO
                 </div>
-                <div class="test-photo" id="adulterationPhotoContainer">
-                    ${data.adulteration_photo ? 
-                        `<img src="${data.adulteration_photo}" alt="Adulteration Test" onerror="this.parentElement.innerHTML='<div class=\'placeholder\'>⚠️ Photo not found. Please add test photo.</div>'">` : 
-                        `<div class="placeholder">📷 Add test photo in "photos/adulteration-test.jpg"</div>`
-                    }
-                </div>
+                ${adulterationPhotoHtml}
             </div>
         `;
         
@@ -621,9 +707,29 @@
         if (data.logo_image) {
             updateLogo(data.logo_image);
         }
+        
+        // Update image overlays with async timestamps
+        if (data.fat_photo) {
+            const fatContainer = document.getElementById('fatPhotoContainer');
+            if (fatContainer) {
+                const imgContainer = fatContainer.querySelector('.image-container');
+                if (imgContainer) {
+                    updateImageOverlay(imgContainer, data.fat_photo);
+                }
+            }
+        }
+        
+        if (data.adulteration_photo) {
+            const adContainer = document.getElementById('adulterationPhotoContainer');
+            if (adContainer) {
+                const imgContainer = adContainer.querySelector('.image-container');
+                if (imgContainer) {
+                    updateImageOverlay(imgContainer, data.adulteration_photo);
+                }
+            }
+        }
     }
-
-    // Function to load data from JSON file
+    
     async function loadData() {
         try {
             const response = await fetch('data.json?' + new Date().getTime());
@@ -640,7 +746,7 @@
             renderReport(defaultData);
         }
     }
-
+    
     loadData();
 </script>
 
