@@ -1,10 +1,9 @@
 {
-  "date": "2026-04-29",
   "fat": 3.1,
   "snf": 8.8,
   "extra_added_water": 0,
-  "logo_image": "images/logo.png",
   "banner_image": "images/trust-banner.jpg",
+  "logo_image": "images/logo.png",
   "fat_photo": "photos/fat-test.jpg",
   "adulteration_photo": "photos/adulteration-test.jpg",
   "tests": {
