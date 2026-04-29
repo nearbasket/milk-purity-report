@@ -261,6 +261,7 @@
             width: 100%;
             border-radius: 20px;
             overflow: hidden;
+            background: #f3f4f6;
         }
 
         .image-container img {
@@ -289,9 +290,6 @@
             border-radius: 20px;
             background: #f3f4f6;
             min-height: 180px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             border: 1px solid #e5e7eb;
             overflow: hidden;
         }
@@ -432,20 +430,7 @@
 <script>
     // ==================== HELPER FUNCTIONS ====================
     
-    // Format date to Indian format (DD-MM-YYYY)
-    function getCurrentDateIST() {
-        const now = new Date();
-        // Convert to IST (UTC+5:30)
-        const istOffset = 5.5 * 60 * 60 * 1000;
-        const istDate = new Date(now.getTime() + istOffset);
-        
-        const day = String(istDate.getUTCDate()).padStart(2, '0');
-        const month = String(istDate.getUTCMonth() + 1).padStart(2, '0');
-        const year = istDate.getUTCFullYear();
-        
-        return `${day}-${month}-${year}`;
-    }
-    
+    // Get current date in IST for display
     function getFormattedDateIST() {
         const now = new Date();
         const istOffset = 5.5 * 60 * 60 * 1000;
@@ -459,16 +444,19 @@
         return `${day} ${month} ${year}`;
     }
     
-    // Get image last modified time via fetch
-    async function getImageModifiedTime(imageUrl) {
+    // Get INDIVIDUAL image last modified time
+    async function getIndividualImageTimestamp(imageUrl) {
         try {
-            // Add cache buster to get fresh headers
-            const response = await fetch(imageUrl + '?t=' + new Date().getTime(), { method: 'HEAD' });
+            // Add cache buster to get fresh headers for EACH image
+            const response = await fetch(imageUrl + '?cb=' + new Date().getTime(), { 
+                method: 'HEAD',
+                cache: 'no-cache'
+            });
             const lastModified = response.headers.get('Last-Modified');
             
             if (lastModified) {
                 const date = new Date(lastModified);
-                // Convert to IST
+                // Convert to IST (UTC+5:30)
                 const istOffset = 5.5 * 60 * 60 * 1000;
                 const istDate = new Date(date.getTime() + istOffset);
                 
@@ -483,13 +471,13 @@
                 return `📸 Tested on ${day}-${month}-${year} at ${hours}:${minutes} ${ampm} IST`;
             }
         } catch (e) {
-            console.warn('Could not fetch modified time:', imageUrl, e);
+            console.warn('Could not fetch modified time for:', imageUrl, e);
         }
-        // Fallback: use current date/time
-        return getFallbackOverlayText();
+        // Fallback: use current time
+        return getCurrentTimeFallback();
     }
     
-    function getFallbackOverlayText() {
+    function getCurrentTimeFallback() {
         const now = new Date();
         const istOffset = 5.5 * 60 * 60 * 1000;
         const istDate = new Date(now.getTime() + istOffset);
@@ -505,25 +493,36 @@
         return `📸 Verified on ${day}-${month}-${year} at ${hours}:${minutes} ${ampm} IST`;
     }
     
-    // Create image HTML with overlay
-    function createImageWithOverlay(imageUrl, altText) {
-        if (!imageUrl) return `<div class="placeholder">📷 No test photo available</div>`;
+    // Load a single image with its own timestamp
+    async function loadImageWithTimestamp(imageUrl, containerId, altText) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
         
-        return `
-            <div class="image-container" data-image-url="${imageUrl}">
-                <img src="${imageUrl}" alt="${altText}" onerror="this.parentElement.innerHTML='<div class=\'placeholder\'>⚠️ Photo not found: ${imageUrl}</div>'">
-                <div class="image-overlay loading-overlay">⏳ Loading test timestamp...</div>
+        // Show loading state
+        container.innerHTML = `
+            <div class="image-container">
+                <img src="${imageUrl}" alt="${altText}" onerror="this.parentElement.innerHTML='<div class=\\'placeholder\\'>⚠️ Photo not found: ${imageUrl}</div>'">
+                <div class="image-overlay">⏳ Loading timestamp...</div>
             </div>
         `;
-    }
-    
-    // Update overlay with actual timestamp
-    async function updateImageOverlay(container, imageUrl) {
+        
+        // Wait for image to load (optional but better UX)
+        const img = container.querySelector('img');
+        if (img) {
+            await new Promise((resolve) => {
+                if (img.complete) resolve();
+                else img.onload = resolve;
+                img.onerror = resolve;
+            });
+        }
+        
+        // Get THIS image's individual timestamp
+        const timestamp = await getIndividualImageTimestamp(imageUrl);
+        
+        // Update overlay for THIS image only
         const overlay = container.querySelector('.image-overlay');
         if (overlay) {
-            const timestamp = await getImageModifiedTime(imageUrl);
             overlay.textContent = timestamp;
-            overlay.classList.remove('loading-overlay');
         }
     }
     
@@ -546,7 +545,7 @@
         return Math.min(100, Math.max(0, percentage));
     }
     
-    // ==================== DEFAULT DATA (No date field needed) ====================
+    // ==================== DEFAULT DATA ====================
     const defaultData = {
         fat: 4.5,
         snf: 8.7,
@@ -575,7 +574,6 @@
         const footerDiv = document.getElementById('reportFooter');
         
         // Auto date - today's date
-        const todayDate = getCurrentDateIST();
         const formattedDate = getFormattedDateIST();
         
         // Calculate percentages
@@ -604,13 +602,13 @@
             </div>
         `;
         
-        // Create photo HTML containers (will be updated async)
+        // Create placeholders for images (will load asynchronously)
         const fatPhotoHtml = data.fat_photo ? 
-            `<div class="test-photo" id="fatPhotoContainer">${createImageWithOverlay(data.fat_photo, "Fat & SNF Test")}</div>` :
+            `<div class="test-photo" id="fatPhotoContainer"></div>` :
             `<div class="test-photo"><div class="placeholder">📷 No fat test photo available</div></div>`;
         
         const adulterationPhotoHtml = data.adulteration_photo ?
-            `<div class="test-photo" id="adulterationPhotoContainer">${createImageWithOverlay(data.adulteration_photo, "Adulteration Test")}</div>` :
+            `<div class="test-photo" id="adulterationPhotoContainer"></div>` :
             `<div class="test-photo"><div class="placeholder">📷 No adulteration test photo available</div></div>`;
         
         const html = `
@@ -708,25 +706,13 @@
             updateLogo(data.logo_image);
         }
         
-        // Update image overlays with async timestamps
+        // Load EACH image INDEPENDENTLY with its own timestamp
         if (data.fat_photo) {
-            const fatContainer = document.getElementById('fatPhotoContainer');
-            if (fatContainer) {
-                const imgContainer = fatContainer.querySelector('.image-container');
-                if (imgContainer) {
-                    updateImageOverlay(imgContainer, data.fat_photo);
-                }
-            }
+            loadImageWithTimestamp(data.fat_photo, 'fatPhotoContainer', 'Fat & SNF Test');
         }
         
         if (data.adulteration_photo) {
-            const adContainer = document.getElementById('adulterationPhotoContainer');
-            if (adContainer) {
-                const imgContainer = adContainer.querySelector('.image-container');
-                if (imgContainer) {
-                    updateImageOverlay(imgContainer, data.adulteration_photo);
-                }
-            }
+            loadImageWithTimestamp(data.adulteration_photo, 'adulterationPhotoContainer', 'Adulteration Test');
         }
     }
     
