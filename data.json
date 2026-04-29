@@ -5,7 +5,9 @@
   "banner_image": "images/trust-banner.jpg",
   "logo_image": "images/logo.png",
   "fat_photo": "photos/fat-test.jpg",
+  "fat_photo_timestamp": "29-04-2026 at 09:30 AM",
   "adulteration_photo": "photos/adulteration-test.jpg",
+  "adulteration_photo_timestamp": "29-04-2026 at 09:45 AM",
   "tests": {
     "added_water": "PASS",
     "starch": "PASS",
