@@ -434,14 +434,10 @@
 
 <script>
     // ==================== COW MILK FIXED RANGE ====================
-    // Cow Milk Standards (CORRECTED):
-    // Fat: 3.0% to 4.5% (not 6%)
+    // Fat: 3.0% to 4.5%
     // SNF: 8.0% to 10.0%
-    // Extra Added Water: 0% to 20% (0% is best)
     
     function calculateFatPercentage(fatValue) {
-        // Fat range: 3.0% to 4.5%
-        // 3.0% = 0%, 4.5% = 100%
         let min = 3.0;
         let max = 4.5;
         let percentage = ((fatValue - min) / (max - min)) * 100;
@@ -449,7 +445,6 @@
     }
     
     function calculateSNFPercentage(snfValue) {
-        // SNF range: 8.0% to 10.0%
         let min = 8.0;
         let max = 10.0;
         let percentage = ((snfValue - min) / (max - min)) * 100;
@@ -457,7 +452,6 @@
     }
     
     function calculateWaterPercentage(waterValue) {
-        // Extra Added Water: 0% to 20% (0% is best)
         let maxWater = 20.0;
         let percentage = ((maxWater - waterValue) / maxWater) * 100;
         return Math.min(100, Math.max(0, percentage));
@@ -478,79 +472,18 @@
         return `${day} ${month} ${year}`;
     }
     
-    // Get LAST MODIFIED TIME for a SPECIFIC image (individual call)
-    async function getSpecificImageModifiedTime(imageUrl) {
-        try {
-            // Add cache buster to get fresh headers
-            const uniqueUrl = imageUrl + '?v=' + new Date().getTime();
-            const response = await fetch(uniqueUrl, { method: 'HEAD' });
-            const lastModified = response.headers.get('Last-Modified');
-            
-            if (lastModified) {
-                const date = new Date(lastModified);
-                // Convert to IST
-                const istOffset = 5.5 * 60 * 60 * 1000;
-                const istDate = new Date(date.getTime() + istOffset);
-                
-                const day = String(istDate.getUTCDate()).padStart(2, '0');
-                const month = String(istDate.getUTCMonth() + 1).padStart(2, '0');
-                const year = istDate.getUTCFullYear();
-                let hours = istDate.getUTCHours();
-                const minutes = String(istDate.getUTCMinutes()).padStart(2, '0');
-                const ampm = hours >= 12 ? 'PM' : 'AM';
-                hours = hours % 12 || 12;
-                
-                return `📸 Tested on ${day}-${month}-${year} at ${hours}:${minutes} ${ampm} IST`;
-            }
-        } catch (e) {
-            console.warn('Could not fetch modified time for:', imageUrl, e);
-        }
-        return null;
-    }
-    
-    // Fallback when modified time not available
-    function getFallbackOverlayText() {
-        const now = new Date();
-        const istOffset = 5.5 * 60 * 60 * 1000;
-        const istDate = new Date(now.getTime() + istOffset);
-        
-        const day = String(istDate.getUTCDate()).padStart(2, '0');
-        const month = String(istDate.getUTCMonth() + 1).padStart(2, '0');
-        const year = istDate.getUTCFullYear();
-        let hours = istDate.getUTCHours();
-        const minutes = String(istDate.getUTCMinutes()).padStart(2, '0');
-        const ampm = hours >= 12 ? 'PM' : 'AM';
-        hours = hours % 12 || 12;
-        
-        return `📸 Verified on ${day}-${month}-${year} at ${hours}:${minutes} ${ampm} IST`;
-    }
-    
-    // Create image HTML with loading overlay
-    function createImageWithOverlay(imageUrl, altText, imageId) {
+    // Create image HTML with timestamp from JSON
+    function createImageWithOverlay(imageUrl, altText, timestamp) {
         if (!imageUrl) return `<div class="placeholder">📷 No test photo available</div>`;
         
+        const overlayText = timestamp ? `📸 Tested on ${timestamp}` : `📸 Test timestamp not available`;
+        
         return `
-            <div class="image-container" data-image-url="${imageUrl}" data-image-id="${imageId}">
+            <div class="image-container">
                 <img src="${imageUrl}" alt="${altText}" onerror="this.parentElement.innerHTML='<div class=\'placeholder\'>⚠️ Photo not found: ${imageUrl}</div>'">
-                <div class="image-overlay" id="overlay-${imageId}">⏳ Loading timestamp...</div>
+                <div class="image-overlay">${overlayText}</div>
             </div>
         `;
-    }
-    
-    // Update INDIVIDUAL image overlay with its own timestamp
-    async function updateIndividualImageOverlay(imageUrl, imageId) {
-        const overlayElement = document.getElementById(`overlay-${imageId}`);
-        if (!overlayElement) return;
-        
-        // Get this specific image's modified time
-        let timestamp = await getSpecificImageModifiedTime(imageUrl);
-        
-        // If no modified time found, use fallback
-        if (!timestamp) {
-            timestamp = getFallbackOverlayText();
-        }
-        
-        overlayElement.textContent = timestamp;
     }
     
     // ==================== DEFAULT DATA ====================
@@ -561,7 +494,9 @@
         banner_image: null,
         logo_image: null,
         fat_photo: null,
+        fat_photo_timestamp: null,
         adulteration_photo: null,
+        adulteration_photo_timestamp: null,
         tests: {
             added_water: "PASS",
             starch: "PASS",
@@ -583,12 +518,12 @@
         
         const formattedDate = getFormattedDateIST();
         
-        // Calculate percentages with CORRECTED ranges
+        // Calculate percentages
         const fatPercent = calculateFatPercentage(data.fat);
         const snfPercent = calculateSNFPercentage(data.snf);
         const waterPercent = calculateWaterPercentage(data.extra_added_water || 0);
         
-        // Range hints with corrected ranges
+        // Range hints
         const fatHint = data.fat >= 4.0 ? "⭐ Premium Rich" : (data.fat >= 3.5 ? "✓ Good Quality" : (data.fat >= 3.0 ? "✓ Standard" : "⚠️ Low"));
         const snfHint = data.snf >= 8.7 ? "⭐ Excellent" : (data.snf >= 8.5 ? "✓ Good" : (data.snf >= 8.0 ? "✓ Standard" : "⚠️ Low"));
         const waterHint = (data.extra_added_water || 0) === 0 ? "✅ No added water" : `⚠️ ${data.extra_added_water}% detected`;
@@ -609,17 +544,13 @@
             </div>
         `;
         
-        // Unique IDs for each image overlay
-        const fatPhotoId = 'fatPhoto_' + Date.now();
-        const adPhotoId = 'adPhoto_' + Date.now();
-        
-        // Create photo HTML
+        // Create photo HTML with timestamps from JSON
         const fatPhotoHtml = data.fat_photo ? 
-            `<div class="test-photo" id="fatPhotoContainer">${createImageWithOverlay(data.fat_photo, "Fat & SNF Test", fatPhotoId)}</div>` :
+            `<div class="test-photo">${createImageWithOverlay(data.fat_photo, "Fat & SNF Test", data.fat_photo_timestamp)}</div>` :
             `<div class="test-photo"><div class="placeholder">📷 No fat test photo available</div></div>`;
         
         const adulterationPhotoHtml = data.adulteration_photo ?
-            `<div class="test-photo" id="adulterationPhotoContainer">${createImageWithOverlay(data.adulteration_photo, "Adulteration Test", adPhotoId)}</div>` :
+            `<div class="test-photo">${createImageWithOverlay(data.adulteration_photo, "Adulteration Test", data.adulteration_photo_timestamp)}</div>` :
             `<div class="test-photo"><div class="placeholder">📷 No adulteration test photo available</div></div>`;
         
         const html = `
@@ -715,15 +646,6 @@
         // Update logo if provided
         if (data.logo_image) {
             updateLogo(data.logo_image);
-        }
-        
-        // Update EACH image overlay INDIVIDUALLY with its own timestamp
-        if (data.fat_photo) {
-            updateIndividualImageOverlay(data.fat_photo, fatPhotoId);
-        }
-        
-        if (data.adulteration_photo) {
-            updateIndividualImageOverlay(data.adulteration_photo, adPhotoId);
         }
     }
     
