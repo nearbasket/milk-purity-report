@@ -1,15 +1,15 @@
 {
-  "fat": 4.2,
-  "snf": 8.5,
-  "extra_added_water": 0,
+  "fat": 6.1,
+  "snf": 8.1,
+  "extra_added_water": 2,
   "banner_image": "images/trust-banner.jpg",
   "logo_image": "images/logo.png",
   "fat_photo": "photos/fat-test.jpg",
-  "fat_photo_timestamp": "03-05-2026 at 12:30 AM",
+  "fat_photo_timestamp": "18-06-2026 at 09:30 AM",
   "adulteration_photo": "photos/adulteration-test.jpg",
-  "adulteration_photo_timestamp": "02-05-2026 at 03:45 PM",
+  "adulteration_photo_timestamp": "19-06-2026 at 08:15 AM",
   "tests": {
-    "added_water": "PASS",
+    "added_water": "SLIGHT WATER DETECTED BUT MAYBE DUE TO HANDLING",
     "starch": "PASS",
     "urea": "PASS",
     "detergent": "PASS"
